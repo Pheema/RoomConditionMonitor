@@ -8,9 +8,10 @@ from datetime import datetime
 
 file_name = "../room_condition.json"
 
+
 def measure_room_condition():
     SENSOR_READ_INTERVAL = 2  # [sec]
-    
+
     db = TinyDB(file_name)
     sensor = CO2Meter.CO2Meter("/dev/hidraw0")
 
@@ -32,7 +33,7 @@ def notify_room_condition_to_slack():
     db = TinyDB(file_name)
     if len(db.all()) == 0:
         return
-    
+
     last_condition = db.all()[-1]
     last_condition_time = datetime.fromtimestamp(last_condition["time"])
     last_condition_co2 = last_condition["room_condition"]["co2"]
@@ -40,7 +41,7 @@ def notify_room_condition_to_slack():
 
     slack = slackweb.Slack(url=os.environ["SLACK_WEBHOOK_URL"])
 
-    notify_text = "Time: {}\nCO2: {} ppm\nTemperature: {} ℃".format(
+    notify_text = "```Time: {}\nCO2: {} ppm\nTemperature: {} ℃```".format(
         last_condition_time, last_condition_co2, last_condition_temperature)
     slack.notify(text=notify_text)
 
